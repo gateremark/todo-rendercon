@@ -61,40 +61,28 @@ export default TodoApp;
 
 ```
 
-2. Connect to Cosmos DB
+2. Connect to Cosmos DB and addTodo endpoint
 
 ```javascript
 import { CosmosClient } from "@azure/cosmos";
-
-const client = new CosmosClient({
-  endpoint: process.env.COSMOS_ENDPOINT!,
-  key: process.env.COSMOS_KEY!,
-});
-
-const database = client.database(process.env.COSMOS_DATABASE_ID!);
-const container = database.container(process.env.COSMOS_CONTAINER_ID!);
-
-export { client, database, container };
-
-```
-
-3. addItem endpoint
-
-```javascript
 import { NextResponse } from "next/server";
-import { container } from "../utils/utils";
 import { v4 as uuidv4 } from "uuid";
+
+const endpoint = process.env.COSMOS_ENDPOINT!;
+const key = process.env.COSMOS_KEY!;
+const client = new CosmosClient({ endpoint, key });
+
+const database = client.database("todo");
+const container = database.container("items");
 
 export const POST = async (req: Request) => {
   const { items } = await req.json();
   const id = uuidv4();
-  await container.items.create({
-    id,
-    items,
-  });
+  await container.items.create({ id, items });
+
   return NextResponse.json({
     success: true,
-    message: "Item added successfully",
+    message: "Todo added successfully",
   });
 };
 
