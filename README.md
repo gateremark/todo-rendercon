@@ -94,7 +94,7 @@ export const POST = async (req: Request) => {
 const [newTodo, setNewTodo] = useState("");
 
   const addTodo = async () => {
-    if (newTodo.trim() === "") return;
+    if (!newTodo) return;
     try {
       await axios.post("/api/addItem", {
         items: [{ text: newTodo, completed: false }],
