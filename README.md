@@ -11,7 +11,12 @@ import { FaTrash } from "react-icons/fa";
 
 const TodoApp = () => {
 
-const [todos, setTodos] = useState([]);
+type Todo = {
+  id: string;
+  items: { text: string; completed: boolean }[];
+};
+
+const [todos, setTodos] = useState<Todo[]>([]);
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
