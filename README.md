@@ -76,15 +76,24 @@ const database = client.database("todo");
 const container = database.container("items");
 
 export const POST = async (req: Request) => {
-  const { items } = await req.json();
-  const id = uuidv4();
-  await container.items.create({ id, items });
+  try {
+    const { items } = await req.json();
+    const id = uuidv4();
+    await container.items.create({ id, items });
 
-  return NextResponse.json({
-    success: true,
-    message: "Todo added successfully",
-  });
+    return NextResponse.json({
+      success: true,
+      message: "Todo added successfully",
+    });
+  } catch (error) {
+    console.error("Error adding todo:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 };
+
 
 ```
 
