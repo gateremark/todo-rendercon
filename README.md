@@ -123,3 +123,92 @@ const [newTodo, setNewTodo] = useState("");
     Add
 </button>
 ```
+
+4. Fetch Todos endpoint
+
+```javascript
+import { NextResponse } from "next/server";
+import { container } from "../utils/utils";
+
+export const GET = async () => {
+  try {
+    const querySpec = {
+      query: "SELECT * FROM c",
+    };
+
+    const { resources: items } = await container.items
+      .query(querySpec)
+      .fetchAll();
+
+    return NextResponse.json({ items }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+};
+```
+
+5. Fetch Todos from UI
+
+```javascript
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  const fetchTodos = async () => {
+    try {
+      const response = await axios.get("/api/getTodos");
+      setTodos(response.data.items || []);
+    } catch (error) {
+      console.error("Error fetching todos:", error);
+    }
+  };
+```
+
+6. Delete Todo endpoint
+
+```javascript
+import { NextRequest, NextResponse } from "next/server";
+import { container } from "../utils/utils";
+
+export const DELETE = async (req: NextRequest) => {
+  try {
+    // Get the id from the request URL
+    const id = req.nextUrl.searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    // Delete the item from the container
+    await container.item(id, id).delete();
+
+    return NextResponse.json(
+      { message: "Todo deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting todo:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+};
+```
+
+7. Delete Todo from UI
+
+```javascript
+  const deleteTodo = async (todoId: string) => {
+    try {
+      await axios.delete(`/api/deleteTodo?id=${todoId}`);
+      fetchTodos();
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
+  };
+```
